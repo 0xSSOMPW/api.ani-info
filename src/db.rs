@@ -1,10 +1,24 @@
 use crate::error::CustomErrorENUM;
 use crate::model::{Anime, AnimeID, AnimeStaff, Episode};
 use crate::query::Query;
-use tokio_postgres::{Client, NoTls};
+use native_tls::{Certificate, TlsConnector};
+use postgres_native_tls::MakeTlsConnector;
+use std::fs;
+use tokio_postgres::Client;
 
-pub async fn establish_connection(database_url: String) -> Result<Client, CustomErrorENUM> {
-    let (client, connection) = tokio_postgres::connect(&database_url, NoTls)
+pub async fn establish_connection(database_url: &str) -> Result<Client, CustomErrorENUM> {
+    let cert_path = "ca.pem";
+    let cert = fs::read(cert_path).map_err(CustomErrorENUM::IoError)?;
+    let cert = Certificate::from_pem(&cert).map_err(CustomErrorENUM::TlsError)?;
+
+    let connector = TlsConnector::builder()
+        .add_root_certificate(cert)
+        .build()
+        .map_err(CustomErrorENUM::TlsError)?;
+
+    let make_tls_connector = MakeTlsConnector::new(connector);
+
+    let (client, connection) = tokio_postgres::connect(database_url, make_tls_connector)
         .await
         .map_err(CustomErrorENUM::DatabaseError)?;
 
