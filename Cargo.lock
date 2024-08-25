@@ -46,6 +46,7 @@ name = "ani-info"
 version = "0.1.0"
 dependencies = [
  "axum 0.7.5",
+ "base64 0.22.1",
  "dotenvy",
  "native-tls",
  "postgres-native-tls",

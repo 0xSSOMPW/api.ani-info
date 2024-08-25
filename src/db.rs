@@ -1,15 +1,17 @@
 use crate::error::CustomErrorENUM;
 use crate::model::{Anime, AnimeID, AnimeStaff, Episode};
 use crate::query::Query;
+use base64::decode;
 use native_tls::{Certificate, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
-use std::fs;
 use tokio_postgres::Client;
 
-pub async fn establish_connection(database_url: &str) -> Result<Client, CustomErrorENUM> {
-    let cert_path = "ca.pem";
-    let cert = fs::read(cert_path).map_err(CustomErrorENUM::IoError)?;
-    let cert = Certificate::from_pem(&cert).map_err(CustomErrorENUM::TlsError)?;
+pub async fn establish_connection(
+    database_url: &str,
+    ca_cert: &str,
+) -> Result<Client, CustomErrorENUM> {
+    let ca_cert_bytes = decode(ca_cert).map_err(CustomErrorENUM::Base64DecodeError)?;
+    let cert = Certificate::from_pem(&ca_cert_bytes).map_err(CustomErrorENUM::TlsError)?;
 
     let connector = TlsConnector::builder()
         .add_root_certificate(cert)

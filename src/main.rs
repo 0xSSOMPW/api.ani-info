@@ -28,8 +28,11 @@ async fn main(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> shuttle_
     // Retrieve the database URL from secrets
     let secret = secret_store.get("DATABASE_URL").unwrap();
 
+    // Retrieve the ca certoficate from secrets
+    let cert = secret_store.get("CA_CERT_BASE64").unwrap();
+
     // Establish the database connection and wrap it in an Arc for shared ownership
-    let client = Arc::new(establish_connection(&secret).await.unwrap());
+    let client = Arc::new(establish_connection(&secret, &cert).await.unwrap());
 
     // Setup router with routes and the database client
     let router = Router::new()
