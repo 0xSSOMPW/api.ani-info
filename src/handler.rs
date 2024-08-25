@@ -1,7 +1,10 @@
 use crate::{
-    db::{fetch_anime_detail_by_id, fetch_anime_ids, fetch_episodes_by_anime_id},
+    db::{
+        fetch_anime_detail_by_id, fetch_anime_ids, fetch_episodes_by_anime_id,
+        fetch_staff_by_anime_id,
+    },
     error::CustomErrorENUM,
-    model::{Anime, AnimeID, Episode},
+    model::{Anime, AnimeID, AnimeStaff, Episode},
 };
 use axum::extract::Path;
 use axum::{Extension, Json};
@@ -29,4 +32,12 @@ pub async fn get_anime_episodes_info_handler(
 ) -> Result<Json<Vec<Episode>>, CustomErrorENUM> {
     let episodes_info = fetch_episodes_by_anime_id(&client, anime_id).await?;
     Ok(Json(episodes_info))
+}
+
+pub async fn get_anime_staff_info_handler(
+    Path(anime_id): Path<i32>,
+    Extension(client): Extension<Arc<Client>>,
+) -> Result<Json<Vec<AnimeStaff>>, CustomErrorENUM> {
+    let staff_info = fetch_staff_by_anime_id(&client, anime_id).await?;
+    Ok(Json(staff_info))
 }

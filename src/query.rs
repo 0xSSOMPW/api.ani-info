@@ -51,12 +51,30 @@ const EPISODES_QUERY: &str = "
         anime_id = $1
 ";
 
+const STAFF_FIND_BY_ANIME_ID_QUERY: &str = "
+    SELECT
+        s.mal_id,
+        s.name,
+        s.image,
+        s.mal_url,
+        a.positions
+    FROM
+        anime_staff a
+    JOIN
+        staff s
+    ON
+        a.staff_id = s.mal_id
+    WHERE
+        a.anime_id = $1;
+";
+
 // Enum to represent queries
 #[derive(Debug)]
 pub enum Query {
     AnimeId,
     AnimeById,
     EpisodesByAnimeId,
+    StaffByAnimeId,
 }
 
 // Implementing a method to get the SQL query from the enum
@@ -66,6 +84,7 @@ impl Query {
             Query::AnimeId => ANIME_ID_QUERY,
             Query::AnimeById => ANIME_FIND_BY_ID_QUERY,
             Query::EpisodesByAnimeId => EPISODES_QUERY,
+            Query::StaffByAnimeId => STAFF_FIND_BY_ANIME_ID_QUERY,
         }
     }
 }

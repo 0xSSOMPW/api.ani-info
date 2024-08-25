@@ -41,3 +41,12 @@ pub struct Episode {
     pub episode_no: i32,
     pub anime_id: i32,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AnimeStaff {
+    pub mal_id: i32,
+    pub name: String,
+    pub image: String,
+    pub mal_url: String,
+    pub positions: Vec<Option<String>>,
+}

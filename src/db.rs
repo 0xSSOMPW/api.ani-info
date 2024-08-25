@@ -1,5 +1,5 @@
 use crate::error::CustomErrorENUM;
-use crate::model::{Anime, AnimeID, Episode};
+use crate::model::{Anime, AnimeID, AnimeStaff, Episode};
 use crate::query::Query;
 use tokio_postgres::{Client, NoTls};
 
@@ -96,6 +96,32 @@ pub async fn fetch_episodes_by_anime_id(
                 episode_no: row.get("episode_no"),
                 is_filler: row.get("is_filler"),
                 anime_id: row.get("anime_id"),
+            })
+            .collect();
+        Ok(episodes)
+    }
+}
+
+pub async fn fetch_staff_by_anime_id(
+    client: &Client,
+    anime_id: i32,
+) -> Result<Vec<AnimeStaff>, CustomErrorENUM> {
+    let rows = client
+        .query(Query::StaffByAnimeId.sql(), &[&(anime_id)])
+        .await
+        .map_err(CustomErrorENUM::DatabaseError)?;
+
+    if rows.is_empty() {
+        Err(CustomErrorENUM::NotFound)
+    } else {
+        let episodes: Vec<AnimeStaff> = rows
+            .iter()
+            .map(|row| AnimeStaff {
+                mal_id: row.get("mal_id"),
+                name: row.get("name"),
+                image: row.get("image"),
+                mal_url: row.get("mal_url"),
+                positions: row.get("positions"),
             })
             .collect();
         Ok(episodes)
