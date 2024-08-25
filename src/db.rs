@@ -13,6 +13,7 @@ pub async fn establish_connection(database_url: &str) -> Result<Client, CustomEr
 
     let connector = TlsConnector::builder()
         .add_root_certificate(cert)
+        .danger_accept_invalid_certs(true)
         .build()
         .map_err(CustomErrorENUM::TlsError)?;
 
