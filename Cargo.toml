@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+shuttle-axum = "0.47.0"
+shuttle-runtime = "0.47.0"
 axum = "0.7.5"
 dotenvy = "0.15.7"
 serde = { version = "1.0.207", features = ["derive"] }
