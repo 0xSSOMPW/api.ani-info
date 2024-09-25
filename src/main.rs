@@ -1,11 +1,9 @@
 use axum::{extract::Extension, http::StatusCode, response::IntoResponse, routing::get, Router};
 use db::establish_connection;
-use handler::{
-    get_anime_detail_by_id_handler, get_anime_episodes_info_handler, get_anime_ids_handler,
-    get_anime_staff_info_handler,
-};
+use handler::HiAnime;
 use shuttle_runtime::SecretStore;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
 mod db;
 mod error;
@@ -34,20 +32,26 @@ async fn main(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> shuttle_
     // Establish the database connection and wrap it in an Arc for shared ownership
     let client = Arc::new(establish_connection(&secret, &cert).await.unwrap());
 
+    let hianime_cache = Arc::new(Mutex::new(HiAnime::new()));
+
     // Setup router with routes and the database client
     let router = Router::new()
         .route("/v1/health", get(health_check))
-        .route("/v1/list", get(get_anime_ids_handler))
-        .route("/v1/anime/:anime_id", get(get_anime_detail_by_id_handler))
+        .route("/v1/list", get(HiAnime::get_anime_ids_handler))
+        .route(
+            "/v1/anime/:anime_id",
+            get(HiAnime::get_anime_detail_by_id_handler),
+        )
         .route(
             "/v1/anime/:anime_id/episodes",
-            get(get_anime_episodes_info_handler),
+            get(HiAnime::get_anime_episodes_info_handler),
         )
         .route(
             "/v1/anime/:anime_id/staff",
-            get(get_anime_staff_info_handler),
+            get(HiAnime::get_anime_staff_info_handler),
         )
         .route("/*path", get(not_found))
+        .layer(Extension(hianime_cache))
         .layer(Extension(client));
 
     Ok(router.into())
