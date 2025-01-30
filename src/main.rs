@@ -50,6 +50,10 @@ async fn main(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> shuttle_
             "/v1/anime/{anime_id}/staff",
             get(HiAnime::get_anime_staff_info_handler),
         )
+        .route(
+            "/v1/mal/{anime_mal_id}",
+            get(HiAnime::get_anime_detail_by_mal_id_handler),
+        )
         .route("/{*wildcard}", get(not_found))
         .layer(Extension(hianime_cache))
         .layer(Extension(client));

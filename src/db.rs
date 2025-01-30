@@ -91,6 +91,48 @@ pub async fn fetch_anime_detail_by_id(
     }
 }
 
+pub async fn fetch_anime_detail_by_mal_id(
+    client: &Client,
+    anime_mal_id: i32,
+) -> Result<Anime, CustomErrorENUM> {
+    let rows = client
+        .query(Query::AnimeByMalId.sql(), &[&(anime_mal_id)])
+        .await
+        .map_err(CustomErrorENUM::DatabaseError)?;
+
+    if rows.is_empty() {
+        Err(CustomErrorENUM::NotFound)
+    } else {
+        let row = &rows[0];
+        let anime = Anime {
+            id: row.get("id"),
+            title: row.get("title"),
+            description: row.get("description"),
+            mal_id: row.get("mal_id"),
+            al_id: row.get("al_id"),
+            japanese_title: row.get("japanese_title"),
+            synonyms: row.get("synonyms"),
+            image: row.get("image"),
+            category: row.get("category"),
+            rating: row.get("rating"),
+            quality: row.get("quality"),
+            duration: row.get("duration"),
+            premiered: row.get("premiered"),
+            aired: row.get("aired"),
+            status: row.get("status"),
+            mal_score: row.get("mal_score"),
+            studios: row.get("studios"),
+            producers: row.get("producers"),
+            genres: row.get("genres"),
+            sub_episodes: row.get("sub_episodes"),
+            dub_episodes: row.get("dub_episodes"),
+            total_episodes: row.get("total_episodes"),
+            sub_or_dub: row.get("sub_or_dub"),
+        };
+        Ok(anime)
+    }
+}
+
 pub async fn fetch_episodes_by_anime_id(
     client: &Client,
     anime_id: i32,
