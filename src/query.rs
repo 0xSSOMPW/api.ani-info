@@ -99,12 +99,44 @@ const ANIME_FIND_BY_MAL_ID_QUERY: &str = "
         mal_id = $1
 ";
 
+const ANIME_FIND_BY_AL_ID_QUERY: &str = "
+    SELECT 
+        id, 
+        title, 
+        description, 
+        mal_id, 
+        al_id, 
+        japanese_title, 
+        synonyms, 
+        image, 
+        category, 
+        rating, 
+        quality, 
+        duration, 
+        premiered, 
+        aired, 
+        status, 
+        mal_score, 
+        studios, 
+        producers, 
+        genres, 
+        sub_episodes, 
+        dub_episodes, 
+        total_episodes, 
+        sub_or_dub 
+    FROM 
+        anime 
+    WHERE 
+        al_id = $1
+";
+
 // Enum to represent queries
 #[derive(Debug)]
 pub enum Query {
     AnimeId,
     AnimeById,
     AnimeByMalId,
+    AnimeByAlId,
     EpisodesByAnimeId,
     StaffByAnimeId,
 }
@@ -116,6 +148,7 @@ impl Query {
             Query::AnimeId => ANIME_ID_QUERY,
             Query::AnimeById => ANIME_FIND_BY_ID_QUERY,
             Query::AnimeByMalId => ANIME_FIND_BY_MAL_ID_QUERY,
+            Query::AnimeByAlId => ANIME_FIND_BY_AL_ID_QUERY,
             Query::EpisodesByAnimeId => EPISODES_QUERY,
             Query::StaffByAnimeId => STAFF_FIND_BY_ANIME_ID_QUERY,
         }
