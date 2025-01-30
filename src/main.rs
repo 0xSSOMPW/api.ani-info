@@ -39,18 +39,18 @@ async fn main(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> shuttle_
         .route("/v1/health", get(health_check))
         .route("/v1/list", get(HiAnime::get_anime_ids_handler))
         .route(
-            "/v1/anime/:anime_id",
+            "/v1/anime/{anime_id}",
             get(HiAnime::get_anime_detail_by_id_handler),
         )
         .route(
-            "/v1/anime/:anime_id/episodes",
+            "/v1/anime/{anime_id}/episodes",
             get(HiAnime::get_anime_episodes_info_handler),
         )
         .route(
-            "/v1/anime/:anime_id/staff",
+            "/v1/anime/{anime_id}/staff",
             get(HiAnime::get_anime_staff_info_handler),
         )
-        .route("/*path", get(not_found))
+        .route("/{*wildcard}", get(not_found))
         .layer(Extension(hianime_cache))
         .layer(Extension(client));
 

@@ -2,3 +2,5 @@
 target/
 Secrets*.toml
 ca.pem
+/target
+.shuttle*
